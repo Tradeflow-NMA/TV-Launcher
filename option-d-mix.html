@@ -1,0 +1,64 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Option D · Cinema Flat</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+/* B's composition, glass panel and app row, with C's flat colour field and heavy type.
+   The featured app is the whole room; the row fades into black at the bottom. */
+:root{
+  --font:"Archivo",system-ui,sans-serif;
+  --surface:#111113; --step:#222225; --label2:#b4b4b8; --meta:#949498;
+  --out:cubic-bezier(.23,1,.32,1);
+}
+.stage{--feat:#d27626;--feat-ink:#140a03}
+.wall{display:none}
+/* shortcut: flat colour stands in for the app's real still; with a picture, add one neutral scrim under the title */
+.backdrop{display:block;background:var(--feat);transition:background-color .3s ease}
+/* B's fade to black at the bottom: the app row melts into the field, and a tile never vanishes into its own colour */
+.backdrop::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.88) 100%)}
+
+/* B's glass panel over the flat field */
+.panel{left:80px;top:60px;width:540px;padding:40px 36px 28px;border-radius:40px;background:rgba(20,20,24,.42);border:1px solid rgba(255,255,255,.14);
+  backdrop-filter:blur(50px) saturate(160%);-webkit-backdrop-filter:blur(50px) saturate(160%);display:flex;flex-direction:column;gap:22px;box-sizing:border-box}
+.panel{--step:rgba(255,255,255,.12);--label2:rgba(240,240,245,.72);--meta:rgba(240,240,245,.68)}
+.clock{font-weight:800;font-size:150px;line-height:.82;letter-spacing:-7px;font-variant-numeric:tabular-nums;margin-left:-6px}
+.date{font-size:31px;color:var(--label2);margin-top:18px}
+.chips{gap:12px}
+.chip{font:600 29px var(--font);background:var(--step);border-radius:999px;padding:14px 26px}
+.rows{gap:4px}
+.row{gap:22px;padding:14px 18px;border-radius:20px;margin:0 -18px}
+.ic{width:52px;height:52px;border-radius:50%;background:var(--step)}
+.ic svg{width:26px;height:26px}
+.row .l{font-size:31px;font-weight:600}
+.row .s{font-size:25px;color:var(--meta);margin-top:2px}
+.row .r{font-size:29px;color:var(--label2)}
+
+.nav{transition:transform .15s var(--out),background-color .15s,color .15s,outline-color .15s}
+.chip.focused,.row.focused{background:#fff;color:#000;transform:scale(1.05)}
+.row.focused .s,.row.focused .r{color:#4a4a4e}
+.row.focused .ic{background:#e6e6e8}
+
+/* no box: giant title straight on the field, focus lands on Open */
+.feature{left:700px;right:80px;top:60px;bottom:330px;overflow:visible;color:var(--feat-ink);transition:color .3s ease}
+.feature .art{display:none}
+.copy{left:0;right:0;bottom:0;gap:16px;transition:opacity .18s ease}
+.feature.swap .copy{opacity:0}
+.feature h2{font:800 230px/.8 var(--font);letter-spacing:-10px;margin-left:-10px}
+.feature p{font:500 36px var(--font);margin-top:14px}
+.btn{margin-top:18px;font:600 29px var(--font);background:var(--feat-ink);color:var(--feat);border-radius:999px;padding:16px 44px;outline:6px solid transparent;outline-offset:6px;transition:transform .15s var(--out),outline-color .15s}
+.feature.focused .btn{transform:scale(1.06);outline-color:var(--feat-ink)}
+.dots{right:0;top:0}
+
+/* B's app row: lift, shadow and a slight lean toward the move */
+.rail{gap:36px;perspective:900px}
+.app{width:320px;height:180px;border-radius:20px;font:600 34px var(--font);--dir:0;transition:transform .15s var(--out),box-shadow .15s var(--out)}
+.app.focused{transform:translateY(-12px) scale(1.1) rotateY(calc(var(--dir)*5deg));box-shadow:0 30px 60px rgba(0,0,0,.65)}
+.name{font:600 25px var(--font);color:var(--label2)}
+@media (prefers-reduced-motion:reduce){.app.focused{transform:translateY(-12px) scale(1.1)}}
+@media (prefers-reduced-transparency:reduce){.panel{background:#18181b;backdrop-filter:none;-webkit-backdrop-filter:none}}
+.toast{background:var(--surface)}
+</style>
+<body data-note="Option B's layout, glass panel and app row, with Option C's flat colour and heavy type. The colour field stands in for each featured app's real picture. Tiles are placeholders for each app's banner.">
+<script src="launcher.js"></script>

@@ -1,0 +1,60 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Option A · Glass</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+/* Closest to tvOS: one glass panel, wallpaper tinted by focus, focus = lift + scale + lean.
+   Focus moves tens of times a minute, so every focus change is 150 ms on a strong ease-out. */
+:root{
+  --font:"Inter",system-ui,sans-serif;
+  --base:#0a0a0c; --label:#fff; --label2:rgba(235,235,245,.64);
+  --platter:rgba(255,255,255,.10); --glass:rgba(28,28,32,.54); --edge:rgba(255,255,255,.16);
+  --out:cubic-bezier(.23,1,.32,1);
+}
+.stage{--tint:#2a2c34;--feat:#d27626}
+.wall{background-color:color-mix(in srgb,var(--tint) 34%,var(--base));transition:background-color .45s ease}
+.wall::before{content:"";position:absolute;inset:0;background:radial-gradient(1100px 760px at 72% 22%,color-mix(in srgb,var(--tint) 42%,transparent),transparent 72%)}
+.wall::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.55),transparent 45%),linear-gradient(180deg,transparent 50%,rgba(0,0,0,.7))}
+
+.panel{left:80px;top:60px;width:540px;padding:44px 36px 28px;border-radius:44px;background:var(--glass);border:1px solid var(--edge);
+  backdrop-filter:blur(40px) saturate(170%);-webkit-backdrop-filter:blur(40px) saturate(170%);display:flex;flex-direction:column;gap:30px}
+.clock{font-weight:300;font-size:140px;line-height:.9;letter-spacing:-5px;font-variant-numeric:tabular-nums;padding-left:8px}
+.date{font-size:31px;color:var(--label2);margin-top:10px;padding-left:12px}
+.chips{gap:16px}
+.chip{font:500 29px var(--font);background:var(--platter);border-radius:999px;padding:16px 30px}
+.rows{gap:6px}
+.row{gap:24px;padding:18px 22px;border-radius:26px}
+.ic{width:56px;height:56px;border-radius:50%;background:var(--platter)}
+.row .l{font-size:31px;font-weight:600}
+.row .s{font-size:25px;color:var(--label2);margin-top:2px}
+.row .r{font-size:29px;color:var(--label2)}
+
+.nav{transition:transform .15s var(--out),box-shadow .15s var(--out),background-color .15s,color .15s}
+.chip.focused,.row.focused{background:#fff;color:#111;transform:scale(1.06);box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.row.focused .s,.row.focused .r{color:rgba(0,0,0,.62)}
+.row.focused .ic{background:rgba(0,0,0,.08)}
+
+.feature{right:80px;top:60px;width:1100px;height:703px;border-radius:44px;background:var(--feat);transition:transform .15s var(--out),box-shadow .15s var(--out),background-color .45s ease}
+.feature .art{position:absolute;inset:0;background:radial-gradient(700px 480px at 84% 24%,rgba(255,255,255,.28),transparent 70%),linear-gradient(100deg,rgba(0,0,0,.72) 0%,rgba(0,0,0,.2) 70%)}
+.copy{left:64px;bottom:56px;right:64px;gap:12px;transition:opacity .18s ease,filter .18s ease}
+.feature.swap .copy{opacity:0;filter:blur(4px)}
+.feature h2{font:700 96px/1 var(--font);letter-spacing:-3px}
+.feature p{font-size:31px;color:rgba(255,255,255,.84)}
+.btn{margin-top:14px;font:600 29px var(--font);background:#fff;color:#111;border-radius:999px;padding:16px 40px}
+.dots{right:56px;bottom:62px;color:#fff}
+.feature.focused{transform:translateY(-10px) scale(1.035);box-shadow:0 40px 80px rgba(0,0,0,.6)}
+
+.rail{gap:40px;perspective:900px}
+.app{width:320px;height:180px;border-radius:24px;font:600 34px var(--font);letter-spacing:-.5px;box-shadow:0 6px 16px rgba(0,0,0,.35);--dir:0}
+.app::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.26) 48%,transparent 62%);opacity:0;transition:opacity .15s}
+.app.focused{transform:translateY(-14px) scale(1.12) rotateY(calc(var(--dir)*5deg));box-shadow:0 34px 60px rgba(0,0,0,.6)}
+.app.focused::after{opacity:1}
+.name{font:500 25px var(--font);color:var(--label2)}
+.toast{background:rgba(28,28,32,.88);border:1px solid var(--edge)}
+@media (prefers-reduced-motion:reduce){.app.focused{transform:translateY(-14px) scale(1.12)}}
+@media (prefers-reduced-transparency:reduce){.panel{background:#1c1c1f;backdrop-filter:none;-webkit-backdrop-filter:none}}
+</style>
+<body data-note="Tiles are placeholders. On the TV each shows the app's own banner, and the wallpaper takes its colour from that banner.">
+<script src="launcher.js"></script>

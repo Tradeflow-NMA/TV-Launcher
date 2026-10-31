@@ -1,0 +1,60 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Option B · Cinema</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Instrument+Serif&display=swap">
+<link rel="stylesheet" href="base.css">
+<style>
+/* The featured app is the room: its picture fills the whole screen, no card around it.
+   Glass earns its place here because there is real content behind it. Serif only on the featured title. */
+:root{
+  --font:"Inter",system-ui,sans-serif; --display:"Instrument Serif",Georgia,serif;
+  --label2:rgba(240,240,245,.7); --platter:rgba(255,255,255,.12);
+  --glass:rgba(20,20,24,.42); --edge:rgba(255,255,255,.14); --out:cubic-bezier(.23,1,.32,1);
+}
+.stage{--feat:#d27626}
+.wall{display:none}
+/* shortcut: colour field stands in for the app's real still (NOVA+ artwork, other apps' banner enlarged and blurred) */
+.backdrop{display:block;background-color:var(--feat);transition:background-color .6s ease}
+.backdrop::before{content:"";position:absolute;inset:0;background:radial-gradient(1000px 800px at 78% 30%,rgba(255,255,255,.32),transparent 70%)}
+.backdrop::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.25) 55%,rgba(0,0,0,.1) 100%),linear-gradient(180deg,transparent 40%,rgba(0,0,0,.85) 100%)}
+
+.panel{left:80px;top:60px;bottom:330px;width:530px;padding:40px 30px 24px;border-radius:40px;background:var(--glass);border:1px solid var(--edge);
+  backdrop-filter:blur(50px) saturate(160%);-webkit-backdrop-filter:blur(50px) saturate(160%);display:flex;flex-direction:column;gap:26px;box-sizing:border-box}
+.clock{font-weight:300;font-size:120px;line-height:.9;letter-spacing:-4px;font-variant-numeric:tabular-nums;padding-left:8px}
+.date{font-size:29px;color:var(--label2);margin-top:10px;padding-left:10px}
+.chips{gap:12px}
+.chip{font:500 27px var(--font);background:var(--platter);border-radius:999px;padding:14px 24px}
+.rows{gap:2px;margin-top:auto}
+.row{gap:20px;padding:14px 18px;border-radius:22px}
+.ic{width:48px;height:48px;border-radius:50%;background:var(--platter)}
+.ic svg{width:24px;height:24px}
+.row .l{font-size:29px;font-weight:600}
+.row .s{font-size:25px;color:var(--label2);margin-top:2px}
+.row .r{font-size:27px;color:var(--label2)}
+
+.nav{transition:transform .15s var(--out),box-shadow .15s var(--out),background-color .15s,color .15s}
+.chip.focused,.row.focused,.feature.focused .btn{background:#fff;color:#111;transform:scale(1.06);box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.row.focused .s,.row.focused .r{color:rgba(0,0,0,.62)}
+.row.focused .ic{background:rgba(0,0,0,.08)}
+
+/* no box: the title sits on the backdrop, focus lands on its Open button */
+.feature{left:700px;right:80px;top:60px;bottom:330px;overflow:visible}
+.feature .art{display:none}
+.copy{left:0;bottom:0;right:0;gap:14px;transition:opacity .18s ease,filter .18s ease}
+.feature.swap .copy{opacity:0;filter:blur(6px)}
+.feature h2{font:400 168px/.9 var(--display);letter-spacing:-3px}
+.feature p{font-size:34px;color:rgba(255,255,255,.86)}
+.btn{margin-top:18px;font:600 29px var(--font);background:var(--platter);border-radius:999px;padding:16px 44px;transition:transform .15s var(--out),background-color .15s,color .15s,box-shadow .15s}
+.dots{right:0;bottom:22px;color:#fff}
+
+.rail{gap:36px;perspective:900px}
+.app{width:320px;height:180px;border-radius:20px;font:600 34px var(--font);letter-spacing:-.5px;--dir:0;transition:transform .15s var(--out),box-shadow .15s var(--out)}
+.app.focused{transform:translateY(-12px) scale(1.1) rotateY(calc(var(--dir)*5deg));box-shadow:0 30px 60px rgba(0,0,0,.65)}
+.name{font:500 25px var(--font);color:var(--label2)}
+.toast{background:rgba(20,20,24,.88);border:1px solid var(--edge)}
+@media (prefers-reduced-motion:reduce){.app.focused{transform:translateY(-12px) scale(1.1)}}
+@media (prefers-reduced-transparency:reduce){.panel{background:#18181b;backdrop-filter:none;-webkit-backdrop-filter:none}}
+</style>
+<body data-note="The colour field stands in for each featured app's real picture. On the TV, NOVA+ shows its own artwork and other apps show their banner, enlarged and softened.">
+<script src="launcher.js"></script>

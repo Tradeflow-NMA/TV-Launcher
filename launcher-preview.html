@@ -1,0 +1,183 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nasrudin TV Home</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+<style>
+/* tvOS-style redo: 1920x1080 stage, 80/60 px safe area, one type family on the tvOS scale,
+   glass only on the left control panel, wallpaper tinted by whatever has focus. Dark only: it's a TV. */
+:root{
+  --base:#0a0a0c;                       /* wallpaper floor */
+  --label:#ffffff;                      /* primary text */
+  --label2:rgba(235,235,245,.62);       /* secondary text, Apple's dark secondaryLabel */
+  --platter:rgba(255,255,255,.10);      /* unfocused button platter */
+  --glass:rgba(28,28,32,.52);           /* regular glass, dark: text sits on it */
+  --glass-edge:rgba(255,255,255,.16);
+  --nova:#e8913a;                       /* NOVA+ brand colour, lives only in its card */
+  --tint:#2a2c34;                       /* set from the focused item */
+  --font:"Inter",system-ui,sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%;margin:0}
+body{background:#000;color:var(--label);font-family:var(--font);padding:16px;box-sizing:border-box;overflow-x:hidden}
+.wrap{display:flex;flex-direction:column;gap:14px;max-width:1400px;margin:0 auto}
+.note{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--label2);font-size:13px}
+.note b{color:var(--label);font-weight:600}
+kbd{font-family:var(--font);border:1px solid var(--glass-edge);border-radius:5px;padding:1px 6px;color:var(--label);font-size:12px}
+.frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;box-shadow:0 0 0 10px #0b0d12,0 30px 80px rgba(0,0,0,.6);background:var(--base)}
+.stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden}
+
+/* wallpaper: calm, full-bleed, takes the focused item's colour, always darkened so text holds contrast */
+.wall{position:absolute;inset:0;background-color:color-mix(in srgb,var(--tint) 38%,var(--base));transition:background-color .7s ease}
+.wall::before{content:"";position:absolute;inset:0;background:radial-gradient(1100px 760px at 72% 22%,color-mix(in srgb,var(--tint) 45%,transparent),transparent 72%);transition:background .7s ease}
+.wall::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.55) 0%,transparent 45%),linear-gradient(180deg,transparent 50%,rgba(0,0,0,.7) 100%)}
+
+/* left panel: the one glass surface */
+.panel{position:absolute;left:80px;top:60px;width:540px;padding:44px 36px 28px;border-radius:44px;background:var(--glass);
+  border:1px solid var(--glass-edge);backdrop-filter:blur(40px) saturate(170%);-webkit-backdrop-filter:blur(40px) saturate(170%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14);display:flex;flex-direction:column;gap:30px}
+.clock{font-weight:300;font-size:140px;line-height:.9;letter-spacing:-5px;font-variant-numeric:tabular-nums;padding-left:8px}
+.date{font-size:31px;color:var(--label2);margin-top:10px;padding-left:12px}
+.chips{display:flex;gap:16px}
+.chip{font:500 29px var(--font);background:var(--platter);border-radius:999px;padding:16px 30px}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:flex;align-items:center;gap:24px;padding:18px 22px;border-radius:26px}
+.ic{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--platter);flex:none}
+.ic svg{width:28px;height:28px}
+.row .l{font-size:31px;font-weight:600}
+.row .s{font-size:25px;color:var(--label2);margin-top:2px}
+.row .r{margin-left:auto;font-size:29px;color:var(--label2);font-variant-numeric:tabular-nums}
+
+/* tvOS focus: white platter for buttons, lift + scale + shadow for everything */
+.nav{transition:transform .2s cubic-bezier(.2,.8,.2,1),box-shadow .2s,background-color .2s,color .2s}
+.chip.focused,.row.focused{background:var(--label);color:#111;transform:scale(1.06);box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.row.focused .s,.row.focused .r{color:rgba(0,0,0,.6)}
+.row.focused .ic{background:rgba(0,0,0,.08)}
+
+/* feature card */
+.feature{position:absolute;right:80px;top:60px;width:1100px;height:600px;border-radius:44px;overflow:hidden;
+  background:linear-gradient(118deg,#140a03 0%,#3a1c08 42%,#8a4414 78%,#d27626 100%)}
+.feature .art{position:absolute;inset:0;background:radial-gradient(640px 420px at 82% 28%,rgba(255,190,110,.5),transparent 70%),
+  repeating-linear-gradient(90deg,rgba(0,0,0,.2) 0 2px,transparent 2px 150px)}
+.feature .copy{position:absolute;left:64px;bottom:56px;right:64px;display:flex;flex-direction:column;gap:12px}
+.eyebrow{font:600 25px var(--font);color:var(--nova)}
+.feature h2{font:700 96px/1 var(--font);margin:0;letter-spacing:-3px}
+.feature p{font-size:29px;color:rgba(255,236,220,.82);margin:0;max-width:640px}
+.btn{align-self:flex-start;margin-top:14px;font:600 29px var(--font);background:var(--label);color:#140a03;border-radius:999px;padding:16px 40px}
+.feature.focused{transform:translateY(-10px) scale(1.035);box-shadow:0 40px 80px rgba(0,0,0,.6)}
+
+/* app row: 16:9 banners like Android TV's, lift + tilt + sheen on focus */
+.rail{position:absolute;left:80px;bottom:72px;display:flex;gap:40px;transition:transform .3s cubic-bezier(.2,.8,.2,1);perspective:900px}
+.app{flex:none;width:320px;height:180px;border-radius:24px;display:grid;place-items:center;font:600 34px var(--font);letter-spacing:-.5px;
+  position:relative;overflow:hidden;box-shadow:0 6px 16px rgba(0,0,0,.35)}
+.app::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.28) 48%,transparent 62%);opacity:0;transform:translateX(-30%);transition:opacity .3s,transform .5s}
+.app.focused{transform:translateY(-14px) scale(1.12) rotateY(var(--ry,0deg));box-shadow:0 34px 60px rgba(0,0,0,.6)}
+.app.focused::after{opacity:1;transform:translateX(30%)}
+.name{position:absolute;left:80px;bottom:28px;font:500 25px var(--font);color:var(--label2);opacity:0;transition:opacity .2s}
+.name.on{opacity:1}
+
+.toast{position:absolute;left:50%;top:60px;transform:translateX(-50%);background:rgba(28,28,32,.85);border:1px solid var(--glass-edge);padding:16px 34px;border-radius:999px;font-size:25px;opacity:0;transition:opacity .25s}
+.toast.on{opacity:1}
+
+@media (prefers-reduced-motion:reduce){
+  .nav,.wall,.wall::before,.rail,.app::after,.toast{transition:none!important}
+  .app.focused{transform:translateY(-14px) scale(1.12)}
+}
+@media (prefers-reduced-transparency:reduce){.panel{background:#1c1c1f;backdrop-filter:none;-webkit-backdrop-filter:none}}
+</style>
+
+<div class="wrap">
+  <div class="note"><span><b>tvOS-style redo of your TV home screen</b> (1920×1080, scaled to fit). Nothing is installed.</span><span>Use <kbd>←</kbd><kbd>↑</kbd><kbd>→</kbd><kbd>↓</kbd> and <kbd>Enter</kbd> like the remote, or click.</span></div>
+  <div class="frame" id="frame">
+    <div class="stage" id="stage">
+      <div class="wall" id="wall"></div>
+
+      <div class="panel">
+        <div>
+          <div class="clock" id="clock">21:50</div>
+          <div class="date" id="date">Friday 30 October</div>
+        </div>
+        <div class="chips">
+          <div class="chip nav" data-g="chips" data-act="Switch to HDMI 1">HDMI 1</div>
+          <div class="chip nav" data-g="chips" data-act="Switch to HDMI 2">HDMI 2</div>
+          <div class="chip nav" data-g="chips" data-act="Open Android settings">Settings</div>
+        </div>
+        <div class="rows">
+          <div class="row nav" data-g="rows" data-act="Resume in NOVA+" data-tint="#e8913a">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+            <div><div class="l">Continue Watching</div><div class="s">NOVA+ · tonight</div></div>
+          </div>
+          <div class="row nav" data-g="rows" data-act="Open all installed apps">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6v6H4zm10 0h6v6h-6zM4 14h6v6H4zm10 0h6v6h-6z"/></svg></span>
+            <div><div class="l">All Apps</div><div class="s">Everything on this TV</div></div>
+            <span class="r">14</span>
+          </div>
+          <div class="row nav" data-g="rows" data-act="Turn the screen off, keep audio">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg></span>
+            <div><div class="l">Screen Off</div><div class="s">Audio keeps playing</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature nav" data-g="feature" data-act="Open NOVA+" data-tint="#e8913a">
+        <div class="art"></div>
+        <div class="copy">
+          <div class="eyebrow">Pinned</div>
+          <h2>NOVA+</h2>
+          <p>Your own cinema library.</p>
+          <div class="btn">Open</div>
+        </div>
+      </div>
+
+      <div class="rail" id="rail"></div>
+      <div class="name" id="name"></div>
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+  <div class="note"><span>Tiles are placeholders. On the TV each one shows the app's own banner, and the wallpaper takes its colour from that banner.</span></div>
+</div>
+
+<script>
+const apps=[
+  ["YouTube","#f2f2f2","#1b1b1b"],["NOVA+","#d27626","#fff"],["Netflix","#141414","#fff"],
+  ["Prime Video","#1a98ff","#fff"],["NRK TV","#0b1f4a","#fff"],["TV 2 Play","#2b2b2b","#fff"],
+  ["Spotify","#121212","#fff"],["Disney+","#0b2a63","#fff"]
+];
+const rail=document.getElementById('rail');
+apps.forEach(([n,bg,fg])=>{const d=document.createElement('div');d.className='app nav';d.dataset.g='rail';d.dataset.act='Open '+n;d.dataset.tint=bg;d.dataset.name=n;d.style.background=bg;d.style.color=fg;d.textContent=n;rail.appendChild(d)});
+
+const frame=document.getElementById('frame'),stage=document.getElementById('stage');
+function fit(){stage.style.transform='scale('+frame.clientWidth/1920+')'}
+new ResizeObserver(fit).observe(frame);fit();
+
+function tick(){const d=new Date();
+  document.getElementById('clock').textContent=d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('date').textContent=d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}
+tick();setInterval(tick,10000);
+
+// D-pad focus, same grid as the first prototype
+const G={chips:[...document.querySelectorAll('[data-g=chips]')],rows:[...document.querySelectorAll('[data-g=rows]')],feature:[...document.querySelectorAll('[data-g=feature]')],rail:[...document.querySelectorAll('[data-g=rail]')]};
+let cur={g:'rail',i:0},tiltT;
+const el=()=>G[cur.g][cur.i];
+function paint(dir){
+  document.querySelectorAll('.focused').forEach(e=>{e.classList.remove('focused');e.style.removeProperty('--ry')});
+  const e=el();e.classList.add('focused');
+  // tilt toward the move, then settle: a D-pad stand-in for tvOS's touch-driven parallax
+  if(cur.g==='rail'&&dir){e.style.setProperty('--ry',dir*7+'deg');clearTimeout(tiltT);tiltT=setTimeout(()=>e.style.setProperty('--ry','0deg'),180)}
+  document.documentElement.style.setProperty('--tint',e.dataset.tint||'#2a2c34');
+  const nm=document.getElementById('name');nm.textContent=e.dataset.name||'';nm.classList.toggle('on',cur.g==='rail');
+  if(cur.g==='rail'){nm.style.left=(80+e.offsetLeft-railOff()+0)+'px';rail.style.transform='translateX('+(-railOff())+'px)'}
+}
+function railOff(){const r=G.rail[cur.g==='rail'?cur.i:0];return Math.max(0,r.offsetLeft-1400)}
+function move(k){const {g,i}=cur;let dir=0;
+  if(g==='rail'){if(k==='ArrowLeft'&&i>0){cur.i--;dir=-1}else if(k==='ArrowRight'&&i<G.rail.length-1){cur.i++;dir=1}else if(k==='ArrowUp')cur=i<2?{g:'rows',i:2}:{g:'feature',i:0}}
+  else if(g==='feature'){if(k==='ArrowDown')cur={g:'rail',i:2};else if(k==='ArrowLeft')cur={g:'rows',i:0}}
+  else if(g==='rows'){if(k==='ArrowUp')cur=i>0?{g,i:i-1}:{g:'chips',i:0};else if(k==='ArrowDown')cur=i<2?{g,i:i+1}:{g:'rail',i:0};else if(k==='ArrowRight')cur={g:'feature',i:0}}
+  else if(g==='chips'){if(k==='ArrowLeft'&&i>0)cur.i--;else if(k==='ArrowRight')cur=i<2?{g,i:i+1}:{g:'feature',i:0};else if(k==='ArrowDown')cur={g:'rows',i:0}}
+  paint(dir)}
+let tt;function act(e){const t=document.getElementById('toast');t.textContent='On the TV: '+e.dataset.act;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1600)}
+document.addEventListener('keydown',e=>{if(e.key.startsWith('Arrow')){e.preventDefault();move(e.key)}else if(e.key==='Enter'){act(el())}});
+Object.entries(G).forEach(([g,list])=>list.forEach((e,i)=>e.addEventListener('click',()=>{cur={g,i};paint(0);act(e)})));
+paint(0);
+</script>
